@@ -1,0 +1,7 @@
+{
+  "name": "YumSnap",
+  "description": "An application that takes a picture of your fridge or pantry, identifies the food items using AI, and suggests quick, time-bound recipes perfect for busy professionals.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

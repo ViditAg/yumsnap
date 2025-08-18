@@ -6,19 +6,51 @@ interface WelcomeScreenProps {
   onStart: () => void;
 }
 
+const FeatureHighlight = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
+  <div className="flex items-start space-x-4">
+    <div className="flex-shrink-0 h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center">
+      {icon}
+    </div>
+    <div>
+      <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+      <p className="text-gray-600">{description}</p>
+    </div>
+  </div>
+);
+
+
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
   return (
-    <div className="flex flex-col items-center justify-center h-full text-center bg-gray-50 p-6">
-      <div className="max-w-md">
+    <div className="flex flex-col items-center justify-center h-full text-center bg-gray-50 p-6 overflow-y-auto">
+      <div className="max-w-xl w-full">
         <div className="flex justify-center items-center mb-6">
           <ChefHatIcon className="h-20 w-20 text-emerald-500" />
         </div>
         <h1 className="text-4xl md:text-5xl font-bold font-display text-gray-800 mb-4">
           Welcome to YumSnap
         </h1>
-        <p className="text-lg text-gray-600 mb-8">
+        <p className="text-lg text-gray-600 mb-12">
           Turn what's in your fridge into delicious, quick meals. Snap a photo, and let AI be your sous-chef!
         </p>
+
+        <div className="space-y-8 text-left mb-12">
+          <FeatureHighlight 
+            icon={<span className="text-2xl font-bold text-emerald-600">1</span>}
+            title="Snap Your Ingredients"
+            description="Take a quick photo of your open fridge, pantry, or countertop."
+          />
+          <FeatureHighlight 
+            icon={<span className="text-2xl font-bold text-emerald-600">2</span>}
+            title="AI-Powered Detection"
+            description="Our AI identifies all your available food items in seconds."
+          />
+          <FeatureHighlight 
+            icon={<span className="text-2xl font-bold text-emerald-600">3</span>}
+            title="Get Instant Recipes"
+            description="Receive custom recipes you can make right now, tailored to your ingredients."
+          />
+        </div>
+
         <button
           onClick={onStart}
           className="group inline-flex items-center justify-center px-8 py-4 bg-emerald-500 text-white font-bold rounded-full shadow-lg hover:bg-emerald-600 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-300"

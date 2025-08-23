@@ -21,7 +21,7 @@ export const identifyIngredients = async (base64Image: string): Promise<string[]
               },
             },
             {
-              text: 'Analyze this image of a fridge or pantry. Identify all the edible food items. Return the response as a JSON array of strings. Only include the names of the food items.',
+              text: 'Identify all edible food items in this image. Respond ONLY with a JSON object in the format: {"ingredients": ["item1", "item2", ...]}. Do not include any other text or explanations.',
             },
           ],
         },
@@ -59,7 +59,7 @@ export const identifyIngredients = async (base64Image: string): Promise<string[]
 
 export const getRecipesForIngredients = async (ingredients: string[]): Promise<Recipe[]> => {
   try {
-    const prompt = `I am a young professional who needs quick and easy dinner recipes for after work, ideally under 45 minutes. Based on the following ingredients: ${ingredients.join(', ')}, suggest 3 recipes. For each recipe, provide the title, a short, enticing description (one sentence), the total cooking time in minutes, a list of required ingredients (prioritizing from the provided list), and step-by-step instructions.`;
+    const prompt = `You are a recipe assistant for busy professionals. Given these ingredients: ${ingredients.join(', ')}, suggest 3 quick and easy recipes that take less than 45 minutes to prepare. Respond ONLY with a JSON object in the format: {"recipes": [{"title": "...", "description": "...", "cookingTime": ..., "ingredients": ["...", ...], "instructions": ["...", ...]}]}. Do not include any other text or explanations.`;
     
     const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
@@ -86,6 +86,7 @@ export const getRecipesForIngredients = async (ingredients: string[]): Promise<R
                                     items: { type: Type.STRING },
                                 },
                             },
+                            required: ["title", "description", "cookingTime", "ingredients", "instructions"]
                         },
                     },
                 },

@@ -12,20 +12,30 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onCancel }) =>
   const [error, setError] = useState<string | null>(null);
 
   const startCamera = useCallback(async () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setError("Your browser does not support camera access.");
+      return;
+    }
+
+    let stream: MediaStream | null = null;
+    const primaryConstraints = { video: { facingMode: 'environment' } };
+    const fallbackConstraints = { video: true };
+
     try {
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-          video: { facingMode: 'environment' } 
-        });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      } else {
-        setError("Your browser does not support camera access.");
-      }
+      stream = await navigator.mediaDevices.getUserMedia(primaryConstraints);
     } catch (err) {
-      console.error("Error accessing camera:", err);
-      setError("Could not access the camera. Please check permissions.");
+      console.warn(`Failed to get camera with primary constraints, trying fallback.`, err);
+      try {
+        stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
+      } catch (fallbackErr) {
+        console.error("Error accessing camera with any constraints:", fallbackErr);
+        setError("Could not access camera. Please check browser permissions.");
+        return;
+      }
+    }
+
+    if (videoRef.current && stream) {
+      videoRef.current.srcObject = stream;
     }
   }, []);
 
@@ -63,7 +73,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onCancel }) =>
         className="w-full h-full object-cover"
       />
       <canvas ref={canvasRef} className="hidden" />
-      {error && <div className="absolute top-4 bg-red-500 text-white p-3 rounded-md">{error}</div>}
+      {error && <div className="absolute top-4 left-4 right-4 bg-red-500 text-white p-3 rounded-md text-center z-10">{error}</div>}
       <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/70 to-transparent flex justify-center items-center space-x-4">
         <button onClick={onCancel} className="px-6 py-3 bg-gray-600 text-white rounded-full font-semibold hover:bg-gray-700 transition">Cancel</button>
         <button onClick={handleCapture} className="w-20 h-20 bg-white rounded-full border-4 border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-300 transition transform hover:scale-110 flex items-center justify-center">

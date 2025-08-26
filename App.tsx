@@ -30,11 +30,16 @@ const App: React.FC = () => {
 
   const processImage = useCallback(async (imageData: string) => {
     try {
+      console.log('[App] Starting image processing...');
       setAppState(AppState.LOADING);
       setLoadingMessage("Identifying Ingredients...");
+      
+      console.log('[App] Calling identifyIngredients...');
       const foundIngredients = await identifyIngredients(imageData);
+      console.log('[App] Identified ingredients:', foundIngredients);
       
       if (foundIngredients.length === 0) {
+        console.warn("[App] No ingredients found in image.");
         setError("We couldn't find any ingredients in your photo. Please try again with a clearer picture.");
         setAppState(AppState.ERROR);
         return;
@@ -43,9 +48,12 @@ const App: React.FC = () => {
       setIngredients(foundIngredients);
       setLoadingMessage("Finding Recipes...");
       
+      console.log('[App] Calling getRecipesForIngredients with:', foundIngredients);
       const suggestedRecipes = await getRecipesForIngredients(foundIngredients);
+      console.log('[App] Suggested recipes:', suggestedRecipes);
       
       if (suggestedRecipes.length === 0) {
+        console.warn("[App] No recipes generated for ingredients.");
         setError("We couldn't generate recipes for the identified ingredients. Please try again.");
         setAppState(AppState.ERROR);
         return;
@@ -53,9 +61,10 @@ const App: React.FC = () => {
 
       setRecipes(suggestedRecipes);
       setAppState(AppState.RESULTS);
+      console.log('[App] Image processing successful. Displaying results.');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred.";
-      console.error(err);
+      console.error('[App] Error during image processing:', err);
       setError(`Failed to process image. ${errorMessage}`);
       setAppState(AppState.ERROR);
     }
